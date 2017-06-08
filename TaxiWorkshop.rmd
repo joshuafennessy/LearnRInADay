@@ -1,0 +1,532 @@
+---
+title: "TaxiWorkshop"
+author: "Josh Fennessy"
+date: "June 7, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#return the current working directory
+getwd()
+
+#change the current working directory to a temp location
+setwd(tempdir())
+
+```
+
+  Operation 1: Download and prep the CSV file
+
+  In this section, you'll be downloading a compressed file, uncompressing it and
+  verifying that the file is correctly saved on disk.  
+
+  You'll want to download the file to a working directory, using a temp directory is fine
+  or you can create another directory to work in, your choice.
+
+
+```{r}
+#location of the file to download
+fileurl <- "https://github.com/joshuafennessy/onedayrworkshopdata/raw/master/samples/bank_holidays.xlsx"
+
+#load the RCurl package to enable the use of the curl_download function
+
+
+#download the file here. Save to a file named NYC_Sample.zip
+
+```
+
+unzip the file when done using the unzip() function
+```{r}
+#you can use ??unzip to search online for help documentation
+
+
+#after unzipping this is the filename for the data file
+taxiFileName <- "NYC_Sample.csv"
+
+#you can read and display the first few lines of the file with this statement
+print(readLines(file(taxiFileName), n=5))
+
+```
+
+
+  End Operation 1
+
+-------------------------
+
+  Operation 2: Read the taxi data into a data.frame
+
+  Now that you have the CSV file downloaded, you can read it into a data.frame
+  Once it's read into a data.frame, the data will be stored completely in memory. The file
+  on disk could be deleted (but please don't) and the data.frame would work just fine.
+
+  After loading the data.frame, you'll have some bonus questions to answer about it to 
+  test your abilities to navigate data structures in R
+
+```{r}
+#install and load the readr package to use the improved CSV file processing
+
+#use the read_csv function to load the data.frame
+nyc_taxi_df <- 
+
+## use this space to work with the nyc_taxi data set and answer the following questions
+##
+## 1. How many variables are there in nyc_taxi?
+##
+## 2. What is the data type of the tpep_dropoff_datetime variable?
+##
+## 3. What was the largest tip_amount?
+
+```
+
+ End Operation 2
+
+----------------------------
+
+  Operation 3: Read the holidays from an Excel file into a data.frame
+
+  Excel is another common source of data in the workplace. In this operation
+  you'll download an Excel file that contains a list of common holidays. We'll
+  use this list in later analysis, but for now, you'll need to load it into a 
+  data.frame so you can use it in the future.
+
+  To work with excel data, you'll want to use the readxl pacakge
+
+```{r}
+#download the Excel file to be used for this operation
+excelfile <- "https://github.com/joshuafennessy/onedayrworkshopdata/blob/master/samples/bank_holidays.xlsx"
+curl_download(excelfile, destfile="bank_holidays.xlsx")
+
+#install and load the readxl package
+
+#using the package documentation, read the bank_holidays.xlsx file, and load the 
+#important data into a data.frame
+holidays_df <-
+  
+## use this space to work with the holidays_df data set and answer the following questions
+##
+## 1. How many obversations are in holidays_df?
+##
+## 2. Which `holidayname` is in the 13th row?
+##
+## 3. What date is exactly in the middle of holidays_df?
+
+```  
+  
+  End Operation 3
+  
+-------------------------
+  
+  Operation 4: Read the daily weather from a database
+
+  In the business world, you'll find that much of the data you work with 
+  will come from a database. In this final operation in the data acquisition
+  section of our workshop you'll connect to a database that is hosted for you.
+
+  You'll use the RODBC package in this section to load weather data for New York. This data 
+  will be used to augment the taxi data and will allow us to build in some additional analysis
+
+```{r}
+install.packages("RODBC")
+library(RODBC)
+
+sqlServerConnetionString = "Driver={ODBC Driver 13 for SQL Server};Server=tcp:jfdw.database.windows.net,1433;Database=weather;Uid=weatherReader;Pwd=Weather1;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+
+mySQLConnectionString = "DRIVER={MySQL ODBC 5.3 UNICODE Driver}; Server=jf.mysql.database.azure.com; Port=3306; Database=weather; Uid=weatherReader@jf; Pwd=Weather1; Option=3;"
+
+#open a connection to the database platform you want to use
+#you'll want to use the odbcDriverConnect() function
+myChannel <- 
+
+#check information about the connection
+odbcGetInfo(myChannel)
+sqlTables(myChannel)
+
+#with an open connection to the database, fill a data.frame with 
+#the weather data.
+weather_df <- 
+
+  ## use this space to work with the holidays_df data set and answer the following questions
+  ##
+  ## 1. How many days had precipitation?
+  ##
+  ## 2. What was the average temp on July 4?
+  ##
+  ## 3. What day had the lowest temperature?
+  
+```
+
+  End Operation 4
+
+--------------------------
+  
+  Operation 5: Rename columns with dplyr
+
+  So many times you'll find that you need to rename a column in a dataset
+  dpylr makes this process really easy
+
+```{r}
+install.packageS("dplyr")
+library(dplyr)
+
+#it's always a good idea to start by making a copy of your data.frame
+#at least during intial development
+nyc_taxi <- nyc_taxi_df
+
+#rename the tpep_dropoff_datetime column to dropoff_time
+#and the tpep_pickup_datetime column to pickup_time
+nyc_taxi <-
+
+```
+
+ End Operation 5
+ 
+--------------------------
+
+ Operation 6: Select columns with dplyr
+
+  Removing uneeded columns is important tool to manage performance
+  and memory usage in R applications. It's also important for keeping
+  data sets organized and easy to understand.
+
+```{r}
+# use dplyr::select() to remove the following columns:
+#       vendorid
+#       ratecodeid
+#       store_and_fwd_flag
+#       payment_type
+nyc_taxi <- 
+  
+#can you find two more ways to perform the task using select?
+  
+```
+
+ End Operation 6
+ 
+-------------------------
+
+ Operation 7: Filtering rows with dplyr
+
+ Filtering rows is a common and important method for cleansing
+ dataset to ensure that accurate models can be built.
+
+```{r}
+#use filter() to remove observations that fall outside of our 
+#geofence boundarides of (40N, -75E) and (41N, -72E)
+nyc_taxi <-
+  
+  #use filter() again to remove observations that have total_amount 
+  #values less than 0
+  nyc_taxi <-
+  
+  #use summary to examine the other columns and see if there is anything
+  #else that should be filtered
+  summary(nyc_taxi)
+
+```
+
+ End Operation 7
+ 
+ ------------------------
+
+ Operation 8: Merging data with dplyr using mutuate and joins
+ 
+ Merging data sets is a useful tool for ensuring that all the right
+ variables are available for each observations.
+
+ Often, we have to fabricate keys to ensure that data merging can 
+ be succesfully completed
+
+```{r}
+# use mutate to generate new date keys based on the pickup_time
+# name the datekey pickup_datekey
+#
+# hint: the lubridate package is helpful for working with dates
+# hint: you can calculate a integer date key with the 
+#      following formula year*10000 + month*100 + day
+nyc_taxi <-
+  
+# with the new datekeys generated for pickup_time merge the
+# nyc_taxi data.frame with the holidays data.frame
+# Do you know which variables you need to merge on?
+#
+# Note: be sure to keep all taxi observations and matching holidays
+nyc_taxi <-
+
+# repeat the above step to merge the nyc_taxi dataset with weather
+# keep in mind the variables needed for matching, and the join type
+nyc_taxi <-
+  
+# do you see any additional columns that you can get rid of?
+# you remember how to remove columns from the data.frame, right?
+nyc_taxi <-
+
+```
+
+ End Operation 8
+
+---------------------
+
+ Operation 9: Feature engineering
+ 
+ Feature engineering is one of the most important steps of data transformation
+ During the feature engineering process, you use business domain knowledge to 
+ help shape the data and provide valid options for modeling
+
+ Often this can include building categorial variables, buckets, or boolean
+ switches to store the result of a decision (bought item or not)
+
+```{r}
+# use the following space to engineer the features listed below.
+# do you want to use mutate or transmute?
+
+#
+#  Pickup/Dropoff hour - The hour of pickup and dropoff (hint: lubridate::hour())
+#  Pickup/Dropoff day - The day of dropoff (hint: lubridate::wday())
+#  isWetDay - True if the preciptation was greater than 0.05"
+#  isHoliday - True if the day is a holiday
+#  tripLength - Short if less than 1 mile, Medium up to 2 miles, Long greater than 2 miles
+#  custTipped - True if the customer tipped the driver
+#  tipPercent - The percent tip of the fare
+#  isBigTip - A tip of greater than 20%
+#
+
+nyc_taxi <-
+  
+```
+
+ End Operation 9
+
+----------------------------
+
+ Bonus Example: Adding geospatial data
+
+ In this section, follow along as we walk through the process of adding in some
+ geospatial data to the nyc_taxi dataset. This section will use the lat/long coordinates of 
+ each pickup and dropoff and associate the NYC region associated with each one.
+
+ There are no exercises to complete in this section.
+
+```{r}
+# Code adapted from: https://github.com/Azure/Cortana-Intelligence-Gallery-Content/blob/master/Tutorials/R-for-SAS-Users/R%20for%20SAS%20Users.md
+
+install.packages (c("rgeos", "sp", "maptools", "ggplot2", "ggrepel"))
+library(rgeos)
+library(sp)
+library(maptools)
+library(ggplot2)
+library(ggrepel)
+
+curl::curl_download(url="https://www.zillowstatic.com/static/shp/ZillowNeighborhoods-NY.zip",              destfile="ZillowNeighborhoods-NY.zip")
+unzip("ZillowNeighborhoods-NY.zip")
+
+nyc_shapefile <- readShapePoly('ZillowNeighborhoods-NY.shp')
+
+head(nyc_shapefile@data, 10)
+nyc_shapefile <- subset(nyc_shapefile, County == 'New York') # limit the data to Manhattan only
+
+nyc_shapefile@data$id <- as.character(nyc_shapefile@data$Name)
+nyc_points <- fortify(gBuffer(nyc_shapefile, byid = TRUE, width = 0), region = "Name")
+
+head(nyc_points, 10)
+nyc_df <- inner_join(nyc_points, nyc_shapefile@data, by = c("id" = "Name"))
+nyc_centroids <- summarize(group_by(nyc_df, id), long = median(long), lat = median(lat))
+
+ggplot(nyc_df) + 
+  aes(long, lat, fill = id) + 
+  geom_polygon() +
+  geom_path(color = "white") +
+  coord_equal() +
+  theme(legend.position = "none") +
+  geom_text_repel(aes(label = id), data = nyc_centroids, size = 3)
+
+data_coords <- data.frame(
+  long = ifelse(is.na(nyc_taxi$pickup_longitude), 0, nyc_taxi$pickup_longitude), 
+  lat = ifelse(is.na(nyc_taxi$pickup_latitude), 0, nyc_taxi$pickup_latitude)
+)
+coordinates(data_coords) <- c('long', 'lat') # we specify the columns that correspond to the coordinates
+# we replace NAs with zeroes, becuase NAs won't work with the `over` function
+nhoods <- over(data_coords, nyc_shapefile) # returns the neighborhoods based on coordinates
+nyc_taxi$pickup_nhood <- nhoods$Name # we attach the neighborhoods to the original data and call it `pickup_nhood`
+
+head(table(nyc_taxi$pickup_nhood, useNA = "ifany"))
+
+data_coords <- data.frame(
+  long = ifelse(is.na(nyc_taxi$dropoff_longitude), 0, nyc_taxi$dropoff_longitude), 
+  lat = ifelse(is.na(nyc_taxi$dropoff_latitude), 0, nyc_taxi$dropoff_latitude)
+)
+coordinates(data_coords) <- c('long', 'lat')
+nhoods <- over(data_coords, nyc_shapefile)
+nyc_taxi$dropoff_nhood <- nhoods$Name
+
+rm(data_coords, nhoods) # delete these objects, as they are no longer needed
+
+```
+
+
+  Operation 9: Predict the fare_amount
+
+  Building anlytics models in R is a bit of an art, but
+  we can break it down into a few simple steps.
+
+  In the exercise below you'll practice building and evaluating
+  a linear regression model. Linear regressions  are use to 
+  predict a continous variable, like sales amount, or height.
+
+```{r}
+# the first step of the modeling process is to split the 
+# data into training and testing sets
+# the dplyr function sample_frac() helps here
+
+nyc_taxi_train <-
+nyc_taxi_test <-
+  
+# with the data split into two groups it's time to train
+# a linear regression model with the training data set
+# after training is complete, you can use summary to evaluate
+# the signafance of variables used in the model
+
+# in this example, you'll be training a model to predict the
+# fare amount. Select many of the variables in the model and 
+# evaluate the signifance of each one
+
+fare_amount_model <-
+  
+# after training a model you're satisfied with, test the
+# the model against known observations.
+# use the predict() and the testing data set.
+# add the predicition results back to the testing
+# result sets to compare the results
+predict()
+cbind()
+
+```
+
+ End Operation 9
+
+-----------------------
+
+  Operation 10: Predict is a customer will tip
+
+  Another popular regression algorithim is a logistic regression.
+  logistic regresion is great for predict a binary varible (Yes/No, True/False)
+
+  In this exercise, you'll build a logistic regression model
+
+```{r}
+# you've already split the datasets, so you can get right into the modeling
+# build your regression model in the space below
+
+custTipped_model <-
+  
+  # a ROC curve is a good way to evaluate the statistical significance of your model
+  # the pROC package is an easy way to build a ROC curve
+  install.packages("pROC")
+library(pROC)
+
+# modify the function below to test significance of your variables
+roc( , plot=TRUE, data=nyc_taxi_train)
+
+```
+
+ End Operation 10
+
+-------------------------
+
+  Operation 11: Predict how much a customer will tip
+
+  Decision trees are a popular algorthim for determining the 
+  The decision can be used to display the actual points where decisions
+  are made for an outcome. 
+
+  Decision trees can be used for regression or classification models and 
+  are a bit more flexible than the linear or logistic regresions from 
+  the previous exercises.
+
+```{r}
+# in this workshop, we'll build a decision tree using rpart
+install.packages("rpart")
+library(rpart)
+
+# you've already split the datasets, so you can get right into the modeling
+# build your regression model in the space below
+
+tipAmount_model <-
+  
+  
+  # once you have the model trained, you can look at the optimal prunings 
+  # for the decision tree using printcp
+  printcp(tipAmount_model)
+
+
+# the best way to understand the decision tree is to plot it
+# rpart.plot is a great package for plotting your decision tree
+install.packages("rpart.plot")
+library(rpart.plot)
+
+```
+
+ End Operation 11
+
+-------------------------
+
+ Visualizations
+
+
+basic scatterplot in R -- boring
+```{r}
+plot(nyc_taxi_sample$trip_distance, nyc_taxi_sample$fare_amount)
+```
+
+ggplot2 provides capabilities to build better visuals
+```{r}
+library(ggplot2)
+
+#here's the most basic scatter plot with ggplot
+(plot <- ggplot(dat=nyc_taxi_sample, aes(x=trip_distance, y=fare_amount)) +
+    geom_point(shape = 1, alpha = .25))
+```
+
+add a fitted line to detect the correlation
+
+```{r}
+(plot + geom_smooth())
+```
+
+it's a lot of points, let's look at another visual
+```{r}
+install.packages("hexbin")
+library(hexbin)
+(plot <- ggplot(dat=nyc_taxi_sample, aes(x=trip_distance, y=fare_amount)) +
+    geom_hex())
+```
+
+we can control the size of the bins
+```{r}
+(plot <- ggplot(dat=nyc_taxi_sample, aes(x=trip_distance, y=fare_amount)) +
+    geom_hex(bins=50))
+```
+
+we can also control the width of the bins
+```{r}
+(plot <- ggplot(dat=nyc_taxi_sample, aes(x=trip_distance, y=fare_amount)) +
+    geom_hex(bins=50, binwidth=c(.25, 5)))
+```
+
+oh, we can also add a regression line
+```{r}
+(plot <- ggplot(dat=nyc_taxi_sample, aes(x=trip_distance, y=fare_amount)) +
+    geom_hex(bins=50, binwidth=c(.25, 5)) +
+    geom_smooth(method = lm))
+```
+
+watch this, we can categorize the hexbins
+```{r}
+(plot <- ggplot(dat=nyc_taxi_sample, aes(x=trip_distance, y=fare_amount, color = custTipped)) +
+    geom_hex(bins=50, binwidth=c(.25, 5)) +
+    geom_smooth(method = lm))
+```
+
+
