@@ -29,7 +29,7 @@ setwd(tempdir())
 
 ```{r}
 #location of the file to download
-fileurl <- "https://github.com/joshuafennessy/onedayrworkshopdata/raw/master/samples/bank_holidays.xlsx"
+fileurl <- "https://github.com/joshuafennessy/onedayrworkshopdata/raw/master/samples/NYC_sample.zip"
 
 #load the RCurl package to enable the use of the curl_download function
 
@@ -96,7 +96,7 @@ nyc_taxi_df <-
 
 ```{r}
 #download the Excel file to be used for this operation
-excelfile <- "https://github.com/joshuafennessy/onedayrworkshopdata/blob/master/samples/bank_holidays.xlsx"
+excelfile <- "https://github.com/joshuafennessy/onedayrworkshopdata/raw/master/samples/bank_holidays.xlsx"
 curl_download(excelfile, destfile="bank_holidays.xlsx")
 
 #install and load the readxl package
