@@ -148,6 +148,9 @@ sqlTables(myChannel)
 #the weather data.
 weather_df <- 
 
+#if you are not able to connect to the database here is the data in a .csv file
+weather_file <- "https://github.com/joshuafennessy/onedayrworkshopdata/raw/master/samples/ny_weather.csv"
+
   ## use this space to work with the holidays_df data set and answer the following questions
   ##
   ## 1. How many days had precipitation?
@@ -376,6 +379,14 @@ rm(data_coords, nhoods) # delete these objects, as they are no longer needed
   predict a continous variable, like sales amount, or height.
 
 ```{r}
+
+#if something went catastrophically wrong with your data engineering
+#I've provided a completed dataset for you at this link.
+#download, unzip, and load into a data.frame named nyc_taxi
+#before continuing
+
+nyc_taxi_completed_data <- "https://github.com/joshuafennessy/onedayrworkshopdata/raw/master/samples/nyc_taxi_full.zip"
+
 # the first step of the modeling process is to split the 
 # data into training and testing sets
 # the dplyr function sample_frac() helps here
